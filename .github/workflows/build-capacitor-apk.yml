@@ -20,7 +20,7 @@ jobs:
         node-version: '18'
         cache: 'npm'
 
-    - name: Create package.json for Capacitor
+    - name: Create package.json with lock file
       run: |
         cat > package.json << 'EOF'
         {
@@ -36,22 +36,21 @@ jobs:
             "cap:build": "cd android && ./gradlew assembleRelease"
           },
           "dependencies": {
-            "@capacitor/android": "^5.0.0",
-            "@capacitor/core": "^5.0.0",
-            "@capacitor/app": "^5.0.0",
-            "@capacitor/camera": "^5.0.0",
-            "@capacitor/geolocation": "^5.0.0",
-            "@capacitor/filesystem": "^5.0.0",
-            "@capacitor/preferences": "^5.0.0"
+            "@capacitor/android": "^5.5.1",
+            "@capacitor/core": "^5.5.1",
+            "@capacitor/app": "^5.0.6",
+            "@capacitor/camera": "^5.0.6",
+            "@capacitor/geolocation": "^5.0.6",
+            "@capacitor/filesystem": "^5.1.4",
+            "@capacitor/preferences": "^5.0.6"
           },
           "devDependencies": {
-            "@capacitor/cli": "^5.0.0"
+            "@capacitor/cli": "^5.5.1"
           }
         }
         EOF
-
-    - name: Install dependencies
-      run: |
+        
+        # Create package-lock.json by installing
         npm install
 
     - name: Initialize Capacitor
@@ -75,6 +74,7 @@ jobs:
     - name: Build Android APK
       run: |
         cd android
+        chmod +x gradlew
         ./gradlew assembleRelease
 
     - name: Upload APK artifact
@@ -83,9 +83,3 @@ jobs:
         name: pser-survey-apk
         path: android/app/build/outputs/apk/release/app-release-unsigned.apk
         retention-days: 30
-
-    - name: Sign APK (optional - for production)
-      if: github.event_name == 'release'
-      run: |
-        echo "Add signing configuration here for production builds"
-        # You would need to set up signing keys in GitHub secrets
