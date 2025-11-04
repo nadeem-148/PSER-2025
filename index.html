@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSER Survey</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PSER Survey Data Collection</h1>
+            <div class="pwa-controls">
+                <button id="installBtn" class="btn btn-install" style="display: none;">📱 Install App</button>
+            </div>
+        </header>
+
+        <form id="surveyForm" class="survey-form">
+            <!-- Block Code Section -->
+            <div class="form-section">
+                <h2>Block Information</h2>
+                <div class="single-row">
+                    <div class="form-group compact">
+                        <label for="blockCode">Block Code</label>
+                        <input type="text" id="blockCode" name="blockCode" required>
+                    </div>
+                    <div class="form-group compact">
+                        <label for="changeBlockCode">Change Block Code</label>
+                        <button type="button" id="changeBlockCode" class="btn btn-secondary">Change</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: Basic Information - UPDATED -->
+            <div class="form-section">
+                <h2>Basic Information</h2>
+                
+                <!-- House Number, Families, X Family in single row -->
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="houseNumber">House Number *</label>
+                        <input type="number" id="houseNumber" name="houseNumber" required min="1" inputmode="numeric">
+                    </div>
+
+                    <div class="form-group compact">
+                        <label for="familiesCount">Families *</label>
+                        <input type="number" id="familiesCount" name="familiesCount" required min="1" max="26" inputmode="numeric">
+                    </div>
+
+                    <div class="form-group compact">
+                        <label>X Family</label>
+                        <div class="radio-group horizontal">
+                            <label class="radio-label">
+                                <input type="radio" name="xFamily" value="yes"> Yes
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="xFamily" value="no" checked> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- House Code, Respondent Name, HOH Name, HOH Father Name in single row -->
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="houseCode">House Code</label>
+                        <input type="text" id="houseCode" name="houseCode" readonly class="house-code-display">
+                    </div>
+
+                    <div class="form-group compact">
+                        <label for="respondentName">Respondent Name *</label>
+                        <input type="text" id="respondentName" name="respondentName" required>
+                    </div>
+
+                    <div class="form-group compact">
+                        <label for="hohName">Head of Household *</label>
+                        <input type="text" id="hohName" name="hohName" required>
+                    </div>
+
+                    <div class="form-group compact">
+                        <label for="hohFatherName">HOH Father Name *</label>
+                        <input type="text" id="hohFatherName" name="hohFatherName" required>
+                    </div>
+                </div>
+
+                <!-- CNIC and Contact in single row -->
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="hohCnic">CNIC No of HoH *</label>
+                        <input type="text" id="hohCnic" name="hohCnic" required placeholder="33301-1234567-1" maxlength="15" inputmode="numeric">
+                    </div>
+
+                    <div class="form-group compact">
+                        <label for="contactNumber">Contact Number *</label>
+                        <input type="text" id="contactNumber" name="contactNumber" required placeholder="0345-1234567" maxlength="12" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Household Members - SINGLE ROW -->
+            <div class="form-section">
+                <h2>Household Members</h2>
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="maleMembers">Male</label>
+                        <input type="number" id="maleMembers" name="maleMembers" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="femaleMembers">Female</label>
+                        <input type="number" id="femaleMembers" name="femaleMembers" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="othersMembers">Others</label>
+                        <input type="number" id="othersMembers" name="othersMembers" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="totalMembers">Total</label>
+                        <input type="number" id="totalMembers" name="totalMembers" readonly placeholder="0" class="total-display">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Location & Media -->
+            <div class="form-section">
+                <h2>Location & Media</h2>
+                
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="houseLocation">House Location</label>
+                        <div class="location-group">
+                            <input type="text" id="houseLocation" name="houseLocation" readonly placeholder="Click to capture location">
+                            <button type="button" id="captureLocation" class="btn-location">📍</button>
+                        </div>
+                        <div class="location-coords" id="locationCoords"></div>
+                    </div>
+
+                    <div class="form-group compact">
+                        <label for="housePhoto">House Photo</label>
+                        <button type="button" id="capturePhoto" class="btn-photo">📷 Open Camera</button>
+                        <div id="photoPreview" class="photo-preview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Livestock - SINGLE ROW -->
+            <div class="form-section">
+                <h2>Livestock</h2>
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="buffalo">Buffalo</label>
+                        <input type="number" id="buffalo" name="buffalo" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="cow">Cow</label>
+                        <input type="number" id="cow" name="cow" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="goat">Goat</label>
+                        <input type="number" id="goat" name="goat" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="sheep">Sheep</label>
+                        <input type="number" id="sheep" name="sheep" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Transport - SINGLE ROW -->
+            <div class="form-section">
+                <h2>Transport</h2>
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="motorcycle">Motorcycle</label>
+                        <input type="number" id="motorcycle" name="motorcycle" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="car">Car</label>
+                        <input type="number" id="car" name="car" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="van">Van</label>
+                        <input type="number" id="van" name="van" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="scooter">Scooter</label>
+                        <input type="number" id="scooter" name="scooter" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6: Appliances - SINGLE ROW -->
+            <div class="form-section">
+                <h2>Appliances</h2>
+                <div class="compact-grid">
+                    <div class="form-group compact">
+                        <label for="solar">Solar</label>
+                        <input type="number" id="solar" name="solar" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="ac">AC</label>
+                        <input type="number" id="ac" name="ac" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="geyser">Geyser</label>
+                        <input type="number" id="geyser" name="geyser" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="washingMachine">Washing Machine</label>
+                        <input type="number" id="washingMachine" name="washingMachine" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                    <div class="form-group compact">
+                        <label for="fridge">Fridge</label>
+                        <input type="number" id="fridge" name="fridge" min="0" placeholder="0" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 7: Additional Information -->
+            <div class="form-section">
+                <h2>Additional Information</h2>
+                <div class="single-row">
+                    <div class="form-group compact">
+                        <label for="registerNumber">Register Number</label>
+                        <input type="number" id="registerNumber" name="registerNumber" placeholder="Optional" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 8: Signature -->
+            <div class="form-section">
+                <h2>Respondent Signature</h2>
+                <div class="single-row">
+                    <div class="form-group compact">
+                        <button type="button" id="captureSignature" class="btn-signature">✍️ Capture Signature</button>
+                        <div id="signaturePreview" class="signature-preview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button type="button" id="saveBtn" class="btn btn-primary">Save</button>
+                <button type="button" id="saveNewBtn" class="btn btn-secondary">Save & New</button>
+                <button type="reset" class="btn btn-reset">Clear Form</button>
+            </div>
+
+            <!-- Backup Restore Buttons at Bottom -->
+            <div class="button-group backup-group">
+                <button id="backupBtn" class="btn btn-backup">💾 Backup Data</button>
+                <button id="restoreBtn" class="btn btn-restore">🔄 Restore Data</button>
+            </div>
+        </form>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2>Search Records</h2>
+            <div class="search-group">
+                <input type="number" id="searchHouseNumber" placeholder="House Number" inputmode="numeric">
+                <input type="text" id="searchCnic" placeholder="CNIC Number" maxlength="15" inputmode="numeric">
+                <button type="button" id="searchBtn" class="btn btn-search">Search</button>
+                <button type="button" id="exportExcel" class="btn btn-export">Export to Excel</button>
+                <button type="button" id="exportPDF" class="btn btn-export">Export to PDF</button>
+                <button type="button" id="clearAllData" class="btn btn-clear">Clear All Data</button>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <!-- Signature Modal -->
+    <div id="signatureModal" class="modal">
+        <div class="modal-content">
+            <h3>Draw Your Signature</h3>
+            <canvas id="signatureCanvas" width="400" height="200"></canvas>
+            <div class="modal-buttons">
+                <button id="clearSignature" class="btn btn-reset">Clear</button>
+                <button id="saveSignature" class="btn btn-primary">Save Signature</button>
+                <button id="cancelSignature" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup/Restore Modal -->
+    <div id="backupModal" class="modal">
+        <div class="modal-content">
+            <h3>Backup & Restore</h3>
+            <div class="backup-options">
+                <button id="downloadBackup" class="btn btn-primary">📥 Download Backup</button>
+                <button id="uploadBackup" class="btn btn-secondary">📤 Upload Backup</button>
+                <input type="file" id="backupFile" accept=".json" style="display: none;">
+            </div>
+            <div class="modal-buttons">
+                <button id="closeBackup" class="btn btn-reset">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content">
+            <h3>Clear All Data</h3>
+            <p>This will delete ALL survey data. This action cannot be undone.</p>
+            <p>Enter device password to confirm:</p>
+            <input type="password" id="passwordInput" placeholder="Enter password" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+            <div class="modal-buttons">
+                <button id="confirmClear" class="btn btn-clear" style="flex: 1;">Clear All Data</button>
+                <button id="cancelClear" class="btn btn-reset" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

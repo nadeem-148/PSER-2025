@@ -1,0 +1,22 @@
+{
+    "name": "PSER Survey Data Collection",
+    "short_name": "PSER Survey",
+    "description": "Progressive Web App for PSER Survey Data Collection",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3498db",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://share.google.com/images/AhYaZ7k2DtFI20MPN",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://share.google.com/images/AhYaZ7k2DtFI20MPN",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

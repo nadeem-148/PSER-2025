@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.pser.survey" version="4.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>PSER Survey</name>
+    <description>PSER Survey Data Collection App with Database</description>
+    <author email="support@pser.com" href="https://pser.com">PSER Team</author>
+    
+    <icon src="https://share.google.com/images/AhYaZ7k2DtFI20MPN" />
+    
+    <platform name="android">
+        <config-file parent="/*" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+    </platform>
+    
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+</widget>
